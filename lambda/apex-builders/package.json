@@ -1,0 +1,18 @@
+{
+  "name": "apex-builders-chat-function",
+  "version": "1.0.0",
+  "description": "Lambda function for Apex Builders construction customer service chatbot",
+  "main": "index.js",
+  "runtime": "nodejs20.x",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["aws-lambda", "chatbot", "bedrock", "apex-builders", "construction"],
+  "author": "CSR AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.614.0",
+    "@aws-sdk/client-dynamodb": "^3.614.0"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,15 @@
+{
+  "name": "csr-ai-backend",
+  "version": "1.0.0",
+  "description": "CSR AI - Customer Service Chatbot with AWS Lambda, Bedrock, and DynamoDB",
+  "main": "index.js",
+  "scripts": {
+    "install-lambdas": "npm install --prefix lambda/demosite && npm install --prefix lambda/apex-builders && npm install --prefix lambda/serenity-spa",
+    "build": "npm run install-lambdas",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["aws-lambda", "bedrock", "dynamodb", "chatbot", "customer-service"],
+  "author": "CSR AI Team",
+  "license": "MIT",
+  "devDependencies": {}
+}

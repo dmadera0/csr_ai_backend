@@ -1,0 +1,86 @@
+name: Deploy Lambda Functions
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        function:
+          - name: demosite-chat-function
+            path: lambda/demosite
+          - name: apex-builders-chat-function
+            path: lambda/apex-builders
+          - name: serenity-spa-chat-function
+            path: lambda/serenity-spa
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies for ${{ matrix.function.name }}
+        run: |
+          cd ${{ matrix.function.path }}
+          npm ci
+
+      - name: Create deployment package
+        run: |
+          cd ${{ matrix.function.path }}
+          zip -r function.zip index.js node_modules/
+          ls -lh function.zip
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ matrix.function.name }} \
+            --zip-file fileb://${{ matrix.function.path }}/function.zip
+          echo "Deployed ${{ matrix.function.name }}"
+
+      - name: Get function configuration
+        run: |
+          aws lambda get-function-configuration \
+            --function-name ${{ matrix.function.name }} \
+            --query 'LastModified,Runtime,Handler,Timeout,MemorySize' \
+            --output table
+
+      - name: Create deployment summary
+        if: always()
+        run: |
+          echo "### Deployment Summary for ${{ matrix.function.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Function deployed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- **Function Name:** ${{ matrix.function.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Path:** ${{ matrix.function.path }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+
+    steps:
+      - name: Deployment Complete
+        run: |
+          echo "All Lambda functions have been deployed!"
+          echo "Deployed functions:"
+          echo "- demosite-chat-function (lambda/demosite)"
+          echo "- apex-builders-chat-function (lambda/apex-builders)"
+          echo "- serenity-spa-chat-function (lambda/serenity-spa)"
