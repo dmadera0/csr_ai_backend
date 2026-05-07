@@ -7,7 +7,7 @@ const dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'u
 const DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'serenity-spa-conversations';
 const KB_ID = process.env.KB_ID || 'AB2OOZFU3J';
 const BUSINESS_NAME = process.env.BUSINESS_NAME || 'serenity-spa';
-const MODEL_ID = 'anthropic.claude-sonnet-4-20250514';
+const MODEL_ID = 'anthropic.claude-sonnet-4-20250514-v1:0';
 
 // Validation helpers
 function validateInput(body) {
