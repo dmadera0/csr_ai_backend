@@ -47,7 +47,7 @@ async function callBedrockWithKB(message) {
         type: 'KNOWLEDGE_BASE',
         knowledgeBaseConfiguration: {
           knowledgeBaseId: KB_ID,
-          modelArn: `arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5-20251001-v1:0`
+          modelArn: `arn:aws:bedrock:us-east-1::foundation-model/us.anthropic.claude-haiku-4-5-20251001-v1:0`
         }
       }
     });
