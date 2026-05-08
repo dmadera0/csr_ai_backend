@@ -7,12 +7,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["aws-lambda", "chatbot", "bedrock", "apex-builders", "construction"],
+  "keywords": [
+    "aws-lambda",
+    "chatbot",
+    "bedrock",
+    "apex-builders",
+    "construction"
+  ],
   "author": "CSR AI Team",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.1045.0",
     "@aws-sdk/client-bedrock-runtime": "^3.614.0",
     "@aws-sdk/client-dynamodb": "^3.614.0"
-  },
-  "devDependencies": {}
+  }
 }
