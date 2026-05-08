@@ -1,7 +1,7 @@
-const { BedrockRuntimeClient, InvokeModelWithResponseStreamCommand } = require('@aws-sdk/client-bedrock-runtime');
+const { BedrockAgentRuntimeClient, RetrieveAndGenerateCommand } = require('@aws-sdk/client-bedrock-agent-runtime');
 const { DynamoDBClient, PutItemCommand } = require('@aws-sdk/client-dynamodb');
 
-const bedrockClient = new BedrockRuntimeClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const bedrockClient = new BedrockAgentRuntimeClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'demosite-conversations';
@@ -41,48 +41,18 @@ Please provide a helpful and professional response.`;
 async function callBedrockWithKB(message) {
   try {
     console.log(`[${BUSINESS_NAME}] Calling Bedrock with KB: ${KB_ID}`);
-
-    const payload = {
-      anthropic_version: 'bedrock-2023-05-31',
-      max_tokens: 1024,
-      temperature: 0.7,
-      system: [
-        {
-          type: 'text',
-          text: 'You are a helpful customer service assistant. Provide accurate, professional, and courteous responses.'
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: buildPrompt(message)
-            }
-          ]
-        }
-      ]
-    };
-
-    const command = new InvokeModelWithResponseStreamCommand({
-      modelId: MODEL_ID,
-      contentType: 'application/json',
-      body: JSON.stringify(payload)
-    });
-
-    const response = await bedrockClient.send(command);
-
-    let fullText = '';
-    for await (const event of response.body) {
-      if (event.chunk && event.chunk.bytes) {
-        const chunk = JSON.parse(Buffer.from(event.chunk.bytes).toString('utf-8'));
-        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-          fullText += chunk.delta.text;
+    const command = new RetrieveAndGenerateCommand({
+      input: { text: message },
+      retrieveAndGenerateConfiguration: {
+        type: 'KNOWLEDGE_BASE',
+        knowledgeBaseConfiguration: {
+          knowledgeBaseId: KB_ID,
+          modelArn: `arn:aws:bedrock:us-east-1::foundation-model/${MODEL_ID}`
         }
       }
-    }
-
+    });
+    const response = await bedrockClient.send(command);
+    const fullText = response.output?.text || 'I could not find an answer to your question.';
     console.log(`[${BUSINESS_NAME}] Bedrock response received (${fullText.length} chars)`);
     return fullText;
   } catch (error) {
