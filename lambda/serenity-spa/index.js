@@ -5,7 +5,7 @@ const bedrockClient = new BedrockAgentRuntimeClient({ region: process.env.AWS_RE
 const dynamoDbClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'serenity-spa-conversations';
-const KB_ID = process.env.KB_ID || 'AB2OOZFU3J';
+const KB_ID = process.env.KB_ID || 'HYNOS9EVJI';
 const BUSINESS_NAME = process.env.BUSINESS_NAME || 'serenity-spa';
 const MODEL_ID = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
 
